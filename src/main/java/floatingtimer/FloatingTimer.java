@@ -1,6 +1,7 @@
-package taskbartime;
+package floatingtimer;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -19,19 +20,18 @@ import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 
 public class FloatingTimer {
-	public static int count = 0;
+	public static int identifier = 0;
 	public static List<JLabel> labels = new ArrayList<JLabel>();
 	
 	public static void main(String[] args) {
-		addWindow();
-        
-		// Get date time from system
 		String systemDateTime = null;
-		int index = 0;
+		final int index = 11; // Hardcoded index of system time
+
+		// Add base widget
+		addWidget();
 		
 		while (true) {
 			systemDateTime = LocalDateTime.now().toString();
-			index = systemDateTime.indexOf("T") + 1;
 
 			for (int i = 0; i < labels.size(); i++) {
 				labels.get(i).setText(systemDateTime.substring(index, index + 8));				
@@ -44,60 +44,76 @@ public class FloatingTimer {
 			}
 		}
 	}
-	
-	public static JFrame configureWindow() {
-		JFrame window = new JFrame();
-		int width = Toolkit.getDefaultToolkit().getScreenSize().width;
-		int height = Toolkit.getDefaultToolkit().getScreenSize().height;		
+
+	public static void addWidget() {
+		JFrame frame = configureFrame();
+		JLabel label = configureLabel();
+		label.setName(Integer.toString(identifier));
 		
-		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setSize(150, 50);
-		window.setLocation((int) (width - (width * 0.11)), (int) (height - (height * 0.15)));
-		window.setResizable(false);
-		window.setUndecorated(true);
-		window.setOpacity(0.6f);
-		window.getContentPane().setBackground(Color.BLACK);
-		window.setAlwaysOnTop(true); 
+		frame.add(label);
+		frame.setVisible(true);
+		
+		labels.add(label);
+		identifier++;
+	}
+	
+	public static JFrame configureFrame() {
+		JFrame frame = new JFrame();
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		int width = screenSize.width;
+		int height = screenSize.height;		
+		
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(150, 50);
+		frame.setLocation((int) (width - (width * 0.11)), (int) (height - (height * 0.15)));
+		frame.setResizable(false);
+		frame.setUndecorated(true);
+		frame.setOpacity(0.6f);
+		frame.getContentPane().setBackground(Color.BLACK);
+		frame.setAlwaysOnTop(true); 
 		
 		 // Enable dragging
         Point mousePos = new Point();
         
-        window.addMouseListener(new MouseAdapter() {
+        frame.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
             	mousePos.setLocation(e.getPoint());
             }
         });
 
-        window.addMouseMotionListener(new MouseMotionAdapter() {
+        frame.addMouseMotionListener(new MouseMotionAdapter() {
             public void mouseDragged(MouseEvent e) {
             	Point currentPos = e.getLocationOnScreen();
-                window.setLocation(currentPos.x - mousePos.x, currentPos.y - mousePos.y);
+                frame.setLocation(currentPos.x - mousePos.x, currentPos.y - mousePos.y);
             }
         });
         
-        window.getRootPane().registerKeyboardAction(e -> System.exit(0),
+        frame.getRootPane().registerKeyboardAction(e -> System.exit(0),
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.CTRL_DOWN_MASK),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
+                JComponent.WHEN_IN_FOCUSED_WINDOW
+        );
         
-        window.getRootPane().registerKeyboardAction(e -> {
-        			addWindow();
+        frame.getRootPane().registerKeyboardAction(e -> {
+        			addWidget();
         		},
         		KeyStroke.getKeyStroke(KeyEvent.VK_K, InputEvent.CTRL_DOWN_MASK),
-        		JComponent.WHEN_IN_FOCUSED_WINDOW);
+        		JComponent.WHEN_IN_FOCUSED_WINDOW
+        );
         
-        window.getRootPane().registerKeyboardAction(e -> {        		
+        frame.getRootPane().registerKeyboardAction(e -> {        		
         		for (int i = 0; i < labels.size(); i++) {
-        			if (labels.get(i).getName().equals(window.getContentPane().getComponents()[0].getName())) {
+        			if (labels.get(i).getName().equals(frame.getContentPane().getComponents()[0].getName())) {
         				labels.remove(i);
         			}
         		}
         		
-        		window.dispose();
+        		frame.dispose();
         	},
                 KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
+                JComponent.WHEN_IN_FOCUSED_WINDOW
+        );
        
-        return window;
+        return frame;
 	}
 	
 	public static JLabel configureLabel() {
@@ -105,17 +121,5 @@ public class FloatingTimer {
 		label.setForeground(Color.WHITE);
 		label.setFont(new Font("Verdana", Font.BOLD, 18));
 		return label;
-	}
-	
-	public static void addWindow() {
-		JFrame window = configureWindow();
-		JLabel label = configureLabel();
-		label.setName(Integer.toString(count));
-		
-		window.add(label);
-		window.setVisible(true);
-
-		labels.add(label);
-		count++;
-	}
+	}	
 }
