@@ -1,4 +1,4 @@
-Use: \n
-Ctrl + J -> CLOSE ALL (NEED TO SELECT ONE)
-Ctrl + K -> DUPLICATE
+Use: <br />
+Ctrl + J -> CLOSE ALL (NEED TO SELECT ONE) <br />
+Ctrl + K -> DUPLICATE <br />
 Ctrl + L -> REMOVE SELECTED
